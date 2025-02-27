@@ -29,13 +29,10 @@ def get_data(sql_query: str, db_config: dict, return_as_dict: bool = True ):
         print(f"Exception here {e}")
 
 
-
-
-def add_books(book: dict, db_config: dict):
+def insert_row(sql_query: str, db_config: dict):
     try:
         with ps.connect(**db_config) as conn:
             with conn.cursor() as cursor:
-                sql_query = "insert into books(\"name\", number_of_sales, reviews, author_id) values ('harry potter 7', 20000, 8, 1);"
                 cursor.execute(sql_query)
                 conn.commit()
                 print("Row was added")
@@ -44,12 +41,28 @@ def add_books(book: dict, db_config: dict):
         print(f"Exception was raised {e}")
 
 
+def delete_row(name: str, db_config: dict, table_name: str = "books"):
+    try:
+        query = f"delete from public.{table_name} where \"name\" = '{name}'"
+        with ps.connect(**db_config) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query)
+                conn.commit()
+                print(f"Successfully deleted row table: {table_name}, name: {name}")
+
+    except Exception as e:
+        print(f"Failed to delete the instance {name}: {e}")
+
+
 if __name__ == '__main__':
+    sql_query = "insert into books(\"name\", number_of_sales, reviews, author_id) values ('harry potter 700', 20000, 8, 1);"
+
     database_config = config.get("database_config")
     database_config['password'] = os.environ['dbeaver_pass']
     if database_config:
 
-        add_books({},database_config)
+        # insert_row(sql_query, database_config)
+        delete_row("harry potter 700", database_config)
         query = "select * from public.books"
         response = get_data(query, database_config)
         print(response)
